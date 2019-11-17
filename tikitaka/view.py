@@ -4,7 +4,9 @@ import os
 import traceback
 from django.http import HttpResponse
 import requests
-# from news_processor.news.naver import NaverNews, News
+from news_processor.news.naver import NaverNews, News
+from django.shortcuts import render
+from django.template import loader
 
 from tikitaka.context import BaseContext
 from django.http import HttpResponseServerError
@@ -43,7 +45,7 @@ class OperatorView(View):
 
         url = "https://openapi.naver.com/v1/search/news.json"
 
-        querystring = {"query": query, "display": "100"}
+        querystring = {"query": query, "display": "30"}
 
         payload = ""
         headers = {
@@ -57,9 +59,21 @@ class OperatorView(View):
         items = []
         for item in response_json.get('items', []):
             link = item.get('link', '')
-            print(item)
-
-        return HttpResponse(response_json)
+            try:
+                soup = NaverNews.get_soup(link)
+                news = NaverNews(soup)
+                item['key_sentences'] = news.key_sentences(3)
+                items.append(item)
+                # print('----------')
+                # print(item['title'])
+                # print(item['link'])
+                # print(item['key_sentences'])
+                # print(item)
+            except:
+                pass
+        return render(request, 'index.html', {
+            'items': items
+        })
 
         # try:
         #     self._op.bake_context(context, request, **kwargs)

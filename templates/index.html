@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input id="queryText" type="text"/>
+<button id="searchBtn" onclick="searchByQuery()">검색</button>
+{% if items %}
+    <ul>
+        {% for item in items %}
+            <li><a href="{{ item.link }}">{{ item.title }}</a></li>
+            {% for k in item.key_sentences %}
+                <p>{{ k }}</p>
+            {% endfor %}
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No item</p>
+{% endif %}
+
+</body>
+</html>
+
+<script type="text/javascript">
+    function searchByQuery() {
+        window.location = "/news?query=" + document.getElementById('queryText').value;
+    }
+</script>
